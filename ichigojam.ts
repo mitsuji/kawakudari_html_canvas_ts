@@ -36,6 +36,24 @@ class Std15 {
 
     public putc (c:number) {
       this.setChar(this.cursorX,this.cursorY,c);
+      if (this.cursorX < this.buffW-1) {
+        this.cursorX ++;
+      } else {
+        if (this.cursorY < this.buffH-1) {
+          this.cursorX = 0;
+          this.cursorY ++;
+        }
+      }
+    }
+
+    public putstr (s:string) {
+      for (var i = 0; i < s.length; i++) {
+        this.putc(s.charCodeAt(i));
+      }
+    }
+
+    public putnum (n:number) {
+      this.putstr(n.toString());
     }
 
     public scr (x:number, y:number): number {

@@ -25,7 +25,12 @@ window.onload = (e) => {
             std15.locate(Math.floor(Math.random() * 32.0),23);
             std15.putc('*'.charCodeAt(0));
             std15.scroll();
-            if (std15.scr(x,5) != 0) running = false;
+            if (std15.scr(x,5) != 0) {
+              std15.locate(0,23);
+              std15.putstr("Game Over...");
+              std15.putnum(frame);
+              running = false;
+            }
         }
         std15.drawScreen();
         ++frame;
