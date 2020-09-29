@@ -1,98 +1,99 @@
-const CHAR_SX = 8;
-const CHAR_SY = 8;
+const CHAR_W = 8;
+const CHAR_H = 8;
 
 class Std15 {
     context: CanvasRenderingContext2D;
-    screen_sx: number;
-    screen_sy: number;
-    cb_sx: number;
-    cb_sy: number;
-    cb_unit: number;
-    charBuff: Array<number>;
-    cursor_x: number;
-    cursor_y: number;
+    screenW: number;
+    screenH: number;
+    buffW: number;
+    buffH: number;
+    dotW: number;
+    dotH: number;
+    buff: Array<number>;
+    cursorX: number;
+    cursorY: number;
 
-    constructor(context: CanvasRenderingContext2D,
-                         screen_sx: number, screen_sy: number,
-                         cb_sx: number, cb_sy:number ) {
+    constructor (context: CanvasRenderingContext2D,
+                 screenW: number, screenH: number,
+                 buffW: number, buffH:number ) {
         this.context = context;
-        this.screen_sx = screen_sx;
-        this.screen_sy = screen_sy;
-        this.cb_sx = cb_sx;
-        this.cb_sy = cb_sy;
-        this.cb_unit = screen_sx / cb_sx / CHAR_SX;
-        this.charBuff = new Array<number>(cb_sx * cb_sy);
-        this.cursor_x = 0;
-        this.cursor_y = 0;
+        this.screenW = screenW;
+        this.screenH = screenH;
+        this.buffW = buffW;
+        this.buffH = buffH;
+        this.dotW = screenW / buffW / CHAR_W;
+        this.dotH = screenH / buffH / CHAR_H;
+        this.buff = new Array<number>(buffW * buffH);
+        this.cursorX = 0;
+        this.cursorY = 0;
         this.cls();
     }
 
-    public locate(x:number, y:number) {
-      this.cursor_x = x;
-      this.cursor_y = y;
+    public locate (x:number, y:number) {
+      this.cursorX = x;
+      this.cursorY = y;
     }
 
-    private _putc(x:number, y:number, c:number) {
-      this.charBuff [y*this.cb_sx+x] = c;
+    public putc (c:number) {
+      this.setChar(this.cursorX,this.cursorY,c);
     }
 
-    public putc(c:number) {
-      this._putc(this.cursor_x,this.cursor_y,c);
+    public scr (x:number, y:number): number {
+      return this.buff [y*this.buffW+x];
     }
 
-    public scr(x:number, y:number): number {
-      return this.charBuff [y*this.cb_sx+x];
-    }
-
-    public cls() {
-      for (var y = 0; y < this.cb_sy; ++y) {
-        for (var x = 0; x < this.cb_sx; ++x) {
-          this.charBuff [y*this.cb_sx+x] = 0;
+    public cls () {
+      for (var y = 0; y < this.buffH; y++) {
+        for (var x = 0; x < this.buffW; x++) {
+          this.setChar(x,y,0);
         }
       }
     }
 
     public scroll () {
-      for (var y = 0; y < this.cb_sy; ++y) {
-        for (var x = 0; x < this.cb_sx; ++x ) {
-      	  if (y == this.cb_sy-1) {
-            this.charBuff [y*this.cb_sx+x] = 0;
+      for (var y = 0; y < this.buffH; y++) {
+        for (var x = 0; x < this.buffW; x++) {
+          if (y == this.buffH-1) {
+            this.setChar(x,y,0);
       	  } else {
-            this.charBuff [y*this.cb_sx+x] = this.charBuff [(y+1)*this.cb_sx+x];
+            this.setChar(x,y,this.scr(x,(y+1)));
       	  }
         }
       }
     }
 
-    private _mapchar (cx:number, cy:number, c:number) {
-      const glyph = FONT[c];
+    private setChar (x:number, y:number, c:number) {
+      this.buff [y*this.buffW+x] = c;
+    }
+
+    private drawChar (cx:number, cy:number, c:number) {
+      const glyph = ICHIGOJAM_FONT[c];
       const hiBits = parseInt(glyph.substring(0,8),16);
       const loBits = parseInt(glyph.substring(8),  16);
-      for(var y = 0 ; y < CHAR_SY; ++y) {
+      for (var y = 0; y < CHAR_H; y++) {
         var line;
         if(y < 4) {
-          line = (hiBits >> (CHAR_SX*(CHAR_SY-y-1-4))) & 0xff;
+          line = (hiBits >> (CHAR_W*(CHAR_H-y-1-4))) & 0xff;
         } else {
-          line = (loBits >> (CHAR_SX*(CHAR_SY-y-1))) & 0xff;
+          line = (loBits >> (CHAR_W*(CHAR_H-y-1))) & 0xff;
         }
-        for(var x = 0 ; x < CHAR_SX; ++x) {
-          const n = (line >> (CHAR_SX-x-1)) & 0x1;
-          if(n){
-            const x0 = (cx*CHAR_SX+x)*this.cb_unit;
-            const y0 = (cy*CHAR_SY+y)*this.cb_unit;
-            this.context.fillRect(x0,y0,this.cb_unit,this.cb_unit);
+        for (var x = 0; x < CHAR_W; x++) {
+          if(((line >> (CHAR_W-x-1)) & 0x1) == 0x1){
+            const x0 = (cx*CHAR_W+x)*this.dotW;
+            const y0 = (cy*CHAR_H+y)*this.dotH;
+            this.context.fillStyle = "rgb(255,255,255)";
+            this.context.fillRect(x0,y0,this.dotW,this.dotH);
           }
         }
       }
     }
 
-    public draw() {
+    public drawScreen () {
       this.context.fillStyle = "rgb(0,0,0)";
-      this.context.fillRect(0,0,this.screen_sx,this.screen_sy);
-      this.context.fillStyle = "rgb(255,255,255)";
-      for (var y = 0; y < this.cb_sy; ++y) {
-        for (var x = 0; x < this.cb_sx; ++x) {
-          this._mapchar(x, y, this.charBuff [y*this.cb_sx+x]);
+      this.context.fillRect(0,0,this.screenW,this.screenH);
+      for (var y = 0; y < this.buffH; y++) {
+        for (var x = 0; x < this.buffW; x++) {
+          this.drawChar(x, y, this.scr(x,y));
         }
       }  
     }
@@ -100,7 +101,13 @@ class Std15 {
 }
 
 
-const FONT = [
+/**
+ *
+ *  CC BY IchigoJam & mitsuji.org
+ *  https://mitsuji.github.io/ichigojam-font.json/
+ *
+ */
+const ICHIGOJAM_FONT = [
     "0000000000000000", 
     "ffffffffffffffff", 
     "ffaaff55ffaaff55", 
