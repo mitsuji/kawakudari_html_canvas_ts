@@ -24,7 +24,7 @@ window.onload = (e) => {
             std15.putc('0'.charCodeAt(0));
             std15.locate(Math.floor(Math.random() * 32.0),23);
             std15.putc('*'.charCodeAt(0));
-            std15.scroll();
+            std15.scroll(DIR_UP);
             if (std15.scr(x,5) != 0) {
               std15.locate(0,23);
               std15.putstr("Game Over...");
