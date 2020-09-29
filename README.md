@@ -2,7 +2,7 @@
 
 This project implements part of the [std15.h](https://github.com/IchigoJam/c4ij/blob/master/src/std15.h) API (from [c4ij](https://github.com/IchigoJam/c4ij)) with [HTML Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API), and [Kawakudari Game](https://ichigojam.github.io/print/en/KAWAKUDARI.html) on top of it.
 
-It will allow programming for [IchigoJam](https://ichigojam.net/index-en.html)-like targets using a TypeScript programming language.
+It will allow programming for [IchigoJam](https://ichigojam.net/index-en.html)-like targets that display [IchigoJam FONT](https://mitsuji.github.io/ichigojam-font.json/) on screen using a TypeScript programming language.
 ```
 window.onload = (e) => {
 
@@ -30,10 +30,15 @@ window.onload = (e) => {
             std15.putc('0'.charCodeAt(0));
             std15.locate(Math.floor(Math.random() * 32.0),23);
             std15.putc('*'.charCodeAt(0));
-            std15.scroll();
-            if (std15.scr(x,5) != 0) running = false;
+            std15.scroll(DIR_UP);
+            if (std15.scr(x,5) != 0) {
+              std15.locate(0,23);
+              std15.putstr("Game Over...");
+              std15.putnum(frame);
+              running = false;
+            }
         }
-        std15.draw();
+        std15.drawScreen();
         ++frame;
     },16);
 
@@ -73,5 +78,10 @@ Reload the browser.
 ```
 
 
+## License
+[![Creative Commons License](https://i.creativecommons.org/l/by/4.0/88x31.png)](http://creativecommons.org/licenses/by/4.0/)
+[CC BY](https://creativecommons.org/licenses/by/4.0/) [mitsuji.org](https://mitsuji.org)
+
+This work is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
 
 
