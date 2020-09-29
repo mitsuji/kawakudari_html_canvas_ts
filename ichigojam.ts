@@ -114,6 +114,32 @@ class Std15 {
       }
     }
 
+    public pset (x:number, y:number) {
+      const cx = Math.floor(x / 2);
+      const cy = Math.floor(y / 2);
+      const c = this.scr(cx,cy);
+
+      const tx = x % 2;
+      const ty = y % 2;
+
+      var b;
+      if (ty == 0 && tx == 0) {
+        b = 1;
+      } else if (ty == 0 && tx != 0) {
+        b = 2;
+      } else if (ty != 0 && tx == 0) {
+        b = 4;
+      } else {
+        b = 8;
+      }
+
+      if((c & 0xf0) == 0x80){
+        this.setChar(cx, cy, c|b);
+      }else{
+        this.setChar(cx, cy, 0x80|b);
+      }
+    }
+
     private setChar (x:number, y:number, c:number) {
       this.buff [y*this.buffW+x] = c;
     }
