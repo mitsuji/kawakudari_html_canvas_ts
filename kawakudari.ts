@@ -27,7 +27,7 @@ window.onload = (e) => {
             std15.scroll();
             if (std15.scr(x,5) != 0) running = false;
         }
-        std15.draw();
+        std15.drawScreen();
         ++frame;
     },16);
 
