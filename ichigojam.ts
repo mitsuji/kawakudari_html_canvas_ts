@@ -1,3 +1,8 @@
+const DIR_UP    = 0;
+const DIR_RIGHT = 1;
+const DIR_DOWN  = 2;
+const DIR_LEFT  = 3;
+
 const CHAR_W = 8;
 const CHAR_H = 8;
 
@@ -68,14 +73,43 @@ class Std15 {
       }
     }
 
-    public scroll () {
+    public scroll (dir:number) {
       for (var y = 0; y < this.buffH; y++) {
         for (var x = 0; x < this.buffW; x++) {
-          if (y == this.buffH-1) {
-            this.setChar(x,y,0);
-      	  } else {
-            this.setChar(x,y,this.scr(x,(y+1)));
-      	  }
+          switch (dir) {
+          case DIR_UP: {
+            if (y == this.buffH-1) {
+              this.setChar(x,y,0);
+            } else {
+              this.setChar(x,y,this.scr(x,(y+1)));
+            }
+          }
+          break;
+          case DIR_RIGHT: {
+            if (x == this.buffW-1) {
+              this.setChar(this.buffW-x-1,y,0);
+            } else {
+              this.setChar(this.buffW-x-1,y,this.scr((this.buffW-x-1)-1,y));
+            }
+          }
+          break;
+          case DIR_DOWN: {
+            if (y == this.buffH-1) {
+              this.setChar(x,(this.buffH-y-1),0);
+            } else {
+              this.setChar(x,(this.buffH-y-1),this.scr(x,(this.buffH-y-1)-1));
+            }
+          }
+          break;
+          case DIR_LEFT: {
+            if (x == this.buffW-1) {
+              this.setChar(x,y,0);
+            } else {
+              this.setChar(x,y,this.scr((x+1),y));
+            }
+          }
+          break;
+          }
         }
       }
     }
